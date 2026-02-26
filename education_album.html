@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Education Album</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cinzel', serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d1810 50%, #0f0f0f 100%);
+            color: #d4af37;
+            overflow-x: hidden;
+            height: auto;
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                45deg,
+                rgba(255, 255, 255, 0.02) 0px,
+                rgba(255, 255, 255, 0.02) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+        }
+        .scroll {
+            width: 120px;
+            height: 80px;
+            background: linear-gradient(to bottom, #f4e4bc, #d4af37);
+            border: 3px solid #d4af37;
+            border-radius: 10px 10px 50px 50px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.8), 0 0 20px rgba(212, 175, 55, 0.5);
+            cursor: pointer;
+            transition: all 2s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .scroll::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 20px;
+            background: radial-gradient(circle, #8b4513, #d4af37);
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+        .scroll::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 20px;
+            background: radial-gradient(circle, #8b4513, #d4af37);
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+        .scroll.open {
+            width: 90%;
+            max-width: 1000px;
+            height: auto;
+            min-height: 800px;
+            border-radius: 20px;
+            background: linear-gradient(to bottom, #f4e4bc, #e8d5a8);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 30px rgba(212, 175, 55, 0.5);
+        }
+        .scroll.open::before, .scroll.open::after {
+            opacity: 0;
+        }
+        .scroll-content {
+            opacity: 0;
+            transition: opacity 1s ease;
+            padding: 20px;
+            text-align: center;
+        }
+        .scroll.open .scroll-content {
+            opacity: 1;
+        }
+        h1 {
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            margin-bottom: 20px;
+        }
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            justify-items: center;
+        }
+        img {
+            border: 3px solid #d4af37;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+            max-width: 100%;
+            height: auto;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        img:hover:not(.pinned) {
+            transform: scale(1.1);
+        }
+        img.pinned {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(1.2);
+            z-index: 20;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+        }
+        a {
+            background: linear-gradient(145deg, #2c2c2c, #1a1a1a);
+            border: 2px solid #d4af37;
+            color: #d4af37;
+            padding: 10px 20px;
+            font-size: 1em;
+            font-family: 'Cinzel', serif;
+            text-decoration: none;
+            border-radius: 15px;
+            margin: 10px;
+            transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+        a:hover {
+            background: linear-gradient(145deg, #3a3a3a, #2c2c2c);
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+        }
+        /* Black Screen Overlay */
+        .black-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 1);
+            z-index: 10;
+            opacity: 1;
+            pointer-events: none;
+            transition: opacity 1.5s ease-out;
+        }
+        .black-overlay.depart {
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="black-overlay" class="black-overlay"></div>
+    <div class="scroll" id="scroll">
+        <div class="scroll-content">
+            <h1>Education Album</h1>
+            <div class="image-grid">
+                <img src="education\education1.jpg" width="400" height="350">
+                <img src="education\education2.jpg" width="400" height="350">
+                <img src="education\education3.jpg" width="400" height="350">
+                <img src="education\education4.jpg" width="350" height="350">
+                <img src="education\education5.jpg" width="500" height="400">
+                <img src="education\education6.jpg" width="400" height="450">
+                <img src="education\education7.jpg" width="400" height="350">
+                <img src="education\education8.jpg" width="400" height="450">
+                <img src="education\education9.jpg" width="400" height="450">
+                <img src="education\education14.jpg" width="350" height="470">
+                <img src="education\education11.jpg" width="450" height="450">
+                <img src="education\education12.jpg" width="650" height="500">
+                <img src="education\education13.jpg" width="480" height="600">
+                <img src="education\p1.jpeg" width="580" height="450">
+            </div>
+            <br><br>
+            <a href="education.html" id="return-lobby">Return to Lobby</a>
+        </div>
+    </div>
+
+    <script>
+        const scroll = document.getElementById('scroll');
+        const blackOverlay = document.getElementById('black-overlay');
+        const returnLobby = document.getElementById('return-lobby');
+        const images = document.querySelectorAll('img');
+
+        // Black screen departs on load, then scroll opens and stays open
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                blackOverlay.classList.add('depart');
+                setTimeout(() => {
+                    scroll.classList.add('open');
+                }, 1500); // Scroll opens after black fade-out and stays open
+            }, 500);
+        });
+
+        // Pin/unpin images on click (only one at a time)
+        images.forEach(img => {
+            img.addEventListener('click', () => {
+                if (img.classList.contains('pinned')) {
+                    img.classList.remove('pinned');
+                } else {
+                    // Unpin any other pinned image
+                    images.forEach(otherImg => otherImg.classList.remove('pinned'));
+                    img.classList.add('pinned');
+                }
+            });
+        });
+
+        // Return to Lobby with black screen fade-in
+        returnLobby.addEventListener('click', (e) => {
+            e.preventDefault();
+            sessionStorage.setItem('returningToLobby', 'true');
+            blackOverlay.classList.remove('depart');
+            blackOverlay.style.opacity = '0';
+            setTimeout(() => {
+                blackOverlay.style.transition = 'opacity 1.5s ease-in';
+                blackOverlay.style.opacity = '1';
+                setTimeout(() => {
+                    window.location.href = 'education.html';
+                }, 1500);
+            }, 100);
+        });
+    </script>
+</body>
+</html>

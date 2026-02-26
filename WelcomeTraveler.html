@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up & Log In Homepage</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cinzel', serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d1810 50%, #0f0f0f 100%);
+            color: #d4af37;
+            overflow-x: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                45deg,
+                rgba(255, 255, 255, 0.02) 0px,
+                rgba(255, 255, 255, 0.02) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+        }
+        .container, .form-container, .lobby {
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            box-sizing: border-box;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: transform 0.6s ease-out, opacity 0.6s ease-out;
+        }
+        .container {
+            z-index: 1;
+        }
+        .form-container, .lobby {
+            z-index: 2;
+            transform: translate(-50%, -50%) translateX(100%) rotateY(15deg);
+            opacity: 0;
+            background: rgba(0, 0, 0, 0.8);
+            border: 3px solid #d4af37;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+        .form-container.left, .lobby.left {
+            transform: translate(-50%, -50%) translateX(-100%) rotateY(-15deg);
+        }
+        .form-container.active, .lobby.active {
+            transform: translate(-50%, -50%) translateX(0) rotateY(0deg);
+            opacity: 1;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 30px rgba(212, 175, 55, 0.5);
+        }
+        h1, h2 {
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            color: #b8860b;
+        }
+        button {
+            background: linear-gradient(145deg, #2c2c2c, #1a1a1a);
+            border: 2px solid #d4af37;
+            color: #d4af37;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            font-family: 'Cinzel', serif;
+            cursor: pointer;
+            border-radius: 15px;
+            margin: 10px;
+            transition: background 0.3s, transform 0.2s, box-shadow 0.3s, opacity 1s ease-out;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+        button:hover {
+            background: linear-gradient(145deg, #3a3a3a, #2c2c2c);
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+        }
+        button.disappear {
+            opacity: 0;
+            pointer-events: none;
+        }
+        form {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 400px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #d4af37;
+            border-radius: 5px;
+            font-size: 1em;
+            background: rgba(255, 255, 255, 0.1);
+            color: #d4af37;
+            font-family: 'Cinzel', serif;
+        }
+        input::placeholder {
+            color: #b8860b;
+        }
+        .back-btn, .logout-btn {
+            background: linear-gradient(145deg, #2c2c2c, #1a1a1a);
+            border: 2px solid #d4af37;
+            color: #d4af37;
+            padding: 10px 20px;
+            font-size: 1em;
+            font-family: 'Cinzel', serif;
+            cursor: pointer;
+            border-radius: 15px;
+            margin-top: 20px;
+            transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+        }
+        .back-btn:hover, .logout-btn:hover {
+            background: linear-gradient(145deg, #3a3a3a, #2c2c2c);
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+        }
+        .hidden {
+            opacity: 0 !important;
+            pointer-events: none;
+        }
+        .error {
+            color: #ff6b6b;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        .quest-btn {
+            display: inline-block;
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 1em;
+        }
+        /* Black Screen Overlay */
+        .black-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 1);
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1.5s ease-in;
+        }
+        .black-overlay.active {
+            opacity: 1;
+        }
+        .black-overlay.depart {
+            opacity: 0;
+        }
+        /* Jumpscare Overlay */
+        .jumpscare-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 1);
+            z-index: 15;
+            opacity: 0;
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .jumpscare-overlay.active {
+            opacity: 1;
+        }
+        .jumpscare-overlay img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body>
+    <div id="black-overlay" class="black-overlay"></div>
+    <div id="jumpscare-overlay" class="jumpscare-overlay">
+        <img src="scary.jpg" alt="Jumpscare">
+    </div>
+    <audio id="scream-audio" src="scream.mp3" preload="auto"></audio>
+    <div id="home" class="container">
+        <h1>Enter the Realm</h1>
+        <p>Join the guild or return to your quest.</p>
+        <button id="signup-btn" aria-label="Go to Sign Up">Sign Up</button>
+        <button id="login-btn" aria-label="Go to Log In">Log In</button>
+    </div>
+
+    <div id="signup-form" class="form-container">
+        <form id="signup">
+            <h2>Claim Thy Name</h2>
+            <input type="text" id="signup-username" placeholder="Username" required aria-label="Username">
+            <input type="password" id="signup-password" placeholder="Password" required aria-label="Password">
+            <input type="password" id="signup-confirm" placeholder="Confirm Password" required aria-label="Confirm Password">
+            <button type="submit" aria-label="Create Account">Forge Account</button>
+            <button type="button" class="back-btn" id="back-to-home-signup" aria-label="Back to Home">Return Home</button>
+            <div id="signup-error" class="error"></div>
+        </form>
+    </div>
+
+    <div id="login-form" class="form-container left">
+        <form id="login">
+            <h2>Resume Thy Quest</h2>
+            <input type="text" id="login-username" placeholder="Username" required aria-label="Username">
+            <input type="password" id="login-password" placeholder="Password" required aria-label="Password">
+            <button type="submit" aria-label="Log In">Enter Realm</button>
+            <button type="button" class="back-btn" id="back-to-home-login" aria-label="Back to Home">Return Home</button>
+            <div id="login-error" class="error"></div>
+        </form>
+    </div>
+
+    <div id="lobby" class="lobby">
+        <h2>Welcome, <span id="user-name"></span>!</h2>
+        <p>Thou hast entered the realm. What quest awaits?</p>
+        <button class="quest-btn" data-href="Personal.html">Personal</button>
+        <button class="quest-btn" data-href="Family.html">Family</button>
+        <button class="quest-btn" data-href="education.html">Education</button>
+        <button class="quest-btn" data-href="collection.html">Collection</button>
+        <button class="quest-btn" id="secret-btn" data-href="secret_games.html" style="display: none;">SECRET???</button>
+        <button class="logout-btn" id="logout-btn" aria-label="Log Out">Depart Realm</button>
+    </div>
+
+    <script>
+        // Utility functions for localStorage
+        function getUsers() {
+            return JSON.parse(localStorage.getItem('medievalUsers') || '[]');
+        }
+        function saveUsers(users) {
+            localStorage.setItem('medievalUsers', JSON.stringify(users));
+        }
+        function getCurrentUser() {
+            return JSON.parse(localStorage.getItem('currentUser') || 'null');
+        }
+        function setCurrentUser(user) {
+            localStorage.setItem('currentUser', JSON.stringify(user));
+        }
+        function clearCurrentUser() {
+            localStorage.removeItem('currentUser');
+        }
+
+        // Elements
+        const home = document.getElementById('home');
+        const signupForm = document.getElementById('signup-form');
+        const loginForm = document.getElementById('login-form');
+        const lobby = document.getElementById('lobby');
+        const signupBtn = document.getElementById('signup-btn');
+        const loginBtn = document.getElementById('login-btn');
+        const backSignup = document.getElementById('back-to-home-signup');
+        const backLogin = document.getElementById('back-to-home-login');
+        const logoutBtn = document.getElementById('logout-btn');
+        const userNameSpan = document.getElementById('user-name');
+        const signupError = document.getElementById('signup-error');
+        const loginError = document.getElementById('login-error');
+        const blackOverlay = document.getElementById('black-overlay');
+        const jumpscareOverlay = document.getElementById('jumpscare-overlay');
+        const screamAudio = document.getElementById('scream-audio');
+        const secretBtn = document.getElementById('secret-btn');
+
+        // Check if user is already logged in on page load
+        window.addEventListener('load', () => {
+            const user = getCurrentUser();
+            if (user) {
+                // If returning from a page, start with black overlay and fade out
+                if (sessionStorage.getItem('returningToLobby') === 'true') {
+                    sessionStorage.removeItem('returningToLobby');
+                    blackOverlay.classList.add('active');
+                    setTimeout(() => {
+                        blackOverlay.classList.add('depart');
+                        setTimeout(() => {
+                            showLobby(user);
+                        }, 1500); // Show lobby after fade-out
+                    }, 500);
+                } else {
+                    showLobby(user);
+                }
+            }
+        });
+
+        // Functions to show/hide sections
+        function showForm(form) {
+            home.classList.add('hidden');
+            lobby.classList.add('hidden');
+            form.classList.add('active');
+        }
+        function hideForm(form) {
+            form.classList.remove('active');
+            setTimeout(() => {
+                home.classList.remove('hidden');
+            }, 300);
+        }
+        function showLobby(user) {
+            home.classList.add('hidden');
+            signupForm.classList.remove('active');
+            loginForm.classList.remove('active');
+            userNameSpan.textContent = user.username;
+            lobby.classList.add('active');
+            // Check for secret access
+            if (user.username === 'Maki' && user.password === '001938') {
+                secretBtn.style.display = 'inline-block';
+            } else {
+                secretBtn.style.display = 'none';
+            }
+        }
+
+        // Event listeners
+        signupBtn.addEventListener('click', () => showForm(signupForm));
+        loginBtn.addEventListener('click', () => showForm(loginForm));
+        backSignup.addEventListener('click', () => hideForm(signupForm));
+        backLogin.addEventListener('click', () => hideForm(loginForm));
+        logoutBtn.addEventListener('click', () => {
+            clearCurrentUser();
+            lobby.classList.remove('active');
+            home.classList.remove('hidden');
+        });
+
+        // Slow button disappearance transition for quest buttons
+        document.querySelectorAll('.quest-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const href = btn.getAttribute('data-href');
+                playButtonDisappear(href);
+            });
+        });
+
+        function playButtonDisappear(href) {
+            sessionStorage.setItem('disappearActive', 'true'); // Flag for target page
+            const clickedBtn = event.target;
+            const allBtns = Array.from(lobby.querySelectorAll('.quest-btn, .logout-btn'));
+            const otherBtns = allBtns.filter(btn => btn !== clickedBtn);
+
+            // Clicked button disappears first
+            clickedBtn.classList.add('disappear');
+
+            // Then other buttons disappear one by one
+            otherBtns.forEach((btn, index) => {
+                setTimeout(() => {
+                    btn.classList.add('disappear');
+                }, (index + 1) * 500); // 0.5s delay between each
+            });
+
+            // After all buttons disappear, fade to black, then navigate
+            setTimeout(() => {
+                blackOverlay.classList.add('active');
+                setTimeout(() => {
+                    window.location.href = href;
+                }, 1500); // Wait for black fade-in
+            }, 3000);
+        }
+
+        // Sign-up logic
+        document.getElementById('signup').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('signup-username').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const confirm = document.getElementById('signup-confirm').value;
+            signupError.textContent = '';
+
+            if (password !== confirm) {
+                signupError.textContent = 'Passwords do not match!';
+                return;
+            }
+
+            const users = getUsers();
+            if (users.find(u => u.username === username)) {
+                signupError.textContent = 'Username already exists!';
+                return;
+            }
+
+            users.push({ username, password });
+            saveUsers(users);
+            alert('Account forged successfully! Return to log in.');
+            hideForm(signupForm);
+        });
+
+        // Login logic
+        document.getElementById('login').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+            loginError.textContent = '';
+
+            const users = getUsers();
+            const user = users.find(u => u.username === username && u.password === password);
+            if (!user) {
+                loginError.textContent = 'Invalid username or password!';
+                return;
+            }
+
+            setCurrentUser(user);
+
+            // Check for secret account jumpscare
+            if (user.username === 'Maki' && user.password === '001938') {
+                jumpscareOverlay.classList.add('active');
+                screamAudio.play(); // Play scream sound
+                setTimeout(() => {
+                    jumpscareOverlay.classList.remove('active');
+                    screamAudio.pause(); // Stop sound if still playing
+                    screamAudio.currentTime = 0; // Reset audio
+                    showLobby(user);
+                }, 5000); // Jumpscare for 5 seconds, then show lobby
+            } else {
+                showLobby(user);
+            }
+        });
+    </script>
+</body>
+</html>
