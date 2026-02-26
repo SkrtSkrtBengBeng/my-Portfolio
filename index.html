@@ -320,7 +320,7 @@
             userNameSpan.textContent = user.username;
             lobby.classList.add('active');
             // Check for secret access
-            if (user.username === 'Tite' && user.password === '123') {
+            if (user.username === 'Maki' && user.password === '001938') {
                 secretBtn.style.display = 'inline-block';
             } else {
                 secretBtn.style.display = 'none';
@@ -414,7 +414,7 @@
             setCurrentUser(user);
 
             // Check for secret account jumpscare
-            if (user.username === 'Tite' && user.password === '123') {
+            if (user.username === 'Maki' && user.password === '001938') {
                 jumpscareOverlay.classList.add('active');
                 screamAudio.play(); // Play scream sound
                 setTimeout(() => {
@@ -430,5 +430,6 @@
     </script>
 </body>
 </html>
+
 
 
