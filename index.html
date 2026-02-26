@@ -406,6 +406,10 @@
 
             const users = getUsers();
             const user = users.find(u => u.username === username && u.password === password);
+            // Hardcoded secret account - works without signing up
+if (!user && username === 'Maki' && password === '001938') {
+    user = { username: 'Maki', password: '001938' };
+}
             if (!user) {
                 loginError.textContent = 'Invalid username or password!';
                 return;
@@ -430,6 +434,7 @@
     </script>
 </body>
 </html>
+
 
 
 
