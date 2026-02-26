@@ -427,9 +427,16 @@
                 showLobby(user);
             }
         });
+
+        fetch('./secret.json')
+      .then(response => response.json())
+      .then(data => {
+        console.log('Secret loaded:', data);
+      });
     </script>
 </body>
 </html>
+
 
 
 
